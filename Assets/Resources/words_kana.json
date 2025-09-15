@@ -1,0 +1,12 @@
+[
+  { "kana": "すし",     "repRomaji": "sushi" },
+  { "kana": "がっこう", "repRomaji": "gakkou" },
+  { "kana": "らーめん", "repRomaji": "ra-men" },
+  { "kana": "せんせい", "repRomaji": "sensei" },
+  { "kana": "でんわ",   "repRomaji": "denwa" },
+  { "kana": "でんしゃ", "repRomaji": "densha" },
+  { "kana": "おちゃ",   "repRomaji": "ocha" },
+  { "kana": "きゅうり", "repRomaji": "kyuuri" },
+  { "kana": "しょうゆ",   "repRomaji": "shouyu" },
+  { "kana": "じてんしゃ","repRomaji": "jitensha" }
+]
