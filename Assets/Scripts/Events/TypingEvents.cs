@@ -16,10 +16,10 @@ namespace TD.Typing
         public static event Action<MistakeEvent> Mistake;
         public static event Action<TickEvent> Tick;
 
-        public static void RaiseWordOk(int scoreDelta, int streak) => WordOk?.Invoke(new WordOkEvent(scoreDelta, streak));
+        public static void RaiseWordOk(int scoreDelta, int streak) => WordOk?.Invoke(new WordOkEvent { scoreDelta = scoreDelta, streak =streak });
         public static void RaiseStreakTier(int tier) => StreakTierUp?.Invoke(new StreakTierEvent(tier));
         public static void RaiseBonusTime(int seconds) => BonusTime?.Invoke(new BonusTimeEvent(seconds));
         public static void RaiseMistake(int streak) => Mistake?.Invoke(new MistakeEvent(streak));
-        public static void RaiseTick(float timeLeftMs) => Tick?.Invoke(new TickEvent(timeLeftMs));
+        public static void RaiseTick(float timeLeftMs) => Tick?.Invoke(new TickEvent { timeLeftMs = timeLeftMs });
     }
 }
