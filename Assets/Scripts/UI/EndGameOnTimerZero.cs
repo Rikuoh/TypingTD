@@ -1,109 +1,55 @@
 using UnityEngine;
-using TD.Typing;              // ← TickEvent を受ける
-using TD.Game;                // ← GameController を呼ぶ
-using TD.TypingBridge;        // ← TypingEngineDriver を参照（無ければ外してOK）
+using TD.Typing;   // TickEvent を受ける
+using TD.Game;     // GameController を呼ぶ
 
 namespace TD.UI
 {
-    /// <summary>
-    /// TypingEvents.Tick を監視し、残り時間が 0 になった瞬間に
-    /// GameController.EndGame(...) を呼び出す。
-    /// 実プレイ時間（elapsed）は UnscaledTime で積算。
-    /// </summary>
     public class EndGameOnTimerZero : MonoBehaviour
     {
-        [Header("Refs")]
-        [SerializeField] private GameController game;            // 空なら自動で探す
-        [SerializeField] private TypingEngineDriver driver;      // エンジンの真値が欲しい場合（任意）
-
-        [Header("Time Count")]
-        [Tooltip("実プレイ時間の積算に UnscaledDeltaTime を使う（UI停止しても進む）")]
+        [SerializeField] private GameController game;
         [SerializeField] private bool useUnscaledTime = true;
+        [SerializeField] private KeyCode forceKey = KeyCode.F9; // テスト用：F9で即リザルト
 
-        [Header("Debug")]
-        [SerializeField] private bool logTransitions = false;
-
-        private bool running;   // Tick が正数になったら true
-        private bool ended;     // 一度だけ EndGame を呼ぶ
-        private float elapsed;  // 実プレイ秒
+        private bool running; // Tickで>0になったらtrue
+        private bool ended;   // 一度だけ EndGame を呼ぶ
+        private float elapsed;
 
         private void Awake()
         {
-            if (!game)   game   = FindObjectOfType<GameController>();
-            if (!driver) driver = FindObjectOfType<TypingEngineDriver>(); // なくてもOK
-            elapsed = 0f;
+            if (!game) game = FindObjectOfType<GameController>();
         }
 
         private void OnEnable()
         {
-            ended = false;
-            running = false;
-            elapsed = 0f;
-
-            // あなたの TypingEvents が TickEvent を投げる前提
-            TypingEvents.Tick += OnTickEvent;
-
-            // もし Tick が float(ms) なら上を外し、下を使ってください：
-            // TypingEvents.TickMs += OnTickMs;
+            running = false; ended = false; elapsed = 0f;
+            TypingEvents.Tick += OnTick;   // ★ TickEvent を受ける
         }
 
         private void OnDisable()
         {
-            TypingEvents.Tick -= OnTickEvent;
-            // TypingEvents.TickMs -= OnTickMs;
+            TypingEvents.Tick -= OnTick;
         }
 
         private void Update()
         {
-            if (!running || ended) return;
-            elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
-        }
+            if (running && !ended)
+                elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
-        // TickEvent 版
-        private void OnTickEvent(TickEvent e)
-        {
-            if (!running && e.timeLeftMs > 0)
-            {
-                running = true;
-                if (logTransitions) Debug.Log("[EndGameOnTimerZero] Run started.");
-            }
-
-            if (!ended && e.timeLeftMs <= 0)
-            {
-                if (logTransitions) Debug.Log("[EndGameOnTimerZero] Time reached zero. Ending…");
+            // テスト用強制終了
+            if (!ended && Input.GetKeyDown(forceKey))
                 EndNow();
-            }
         }
 
-        // float(ms) 版（必要なら使う）
-        private void OnTickMs(float ms)
+        private void OnTick(TickEvent e)
         {
-            if (!running && ms > 0) running = true;
-            if (!ended && ms <= 0) EndNow();
+            if (!running && e.timeLeftMs > 0f) running = true;
+            if (!ended && e.timeLeftMs <= 0f) EndNow();
         }
 
         private void EndNow()
         {
             ended = true;
-
-            if (!game)
-            {
-                Debug.LogWarning("[EndGameOnTimerZero] GameController が見つかりません。");
-                return;
-            }
-
-            // （任意）TypingEngineDriver があれば、終了直前に“エンジンの真値”を Game に渡す
-            // ※ GameController に ApplyEngineSummary(TypingState,float) を実装している場合のみ
-            //    未実装ならこの if ブロックごと削除/コメントアウトしてください。
-            // if (driver && game)
-            // {
-            //     #if true
-            //     game.ApplyEngineSummary(driver.GetFinalState(), driver.ElapsedSeconds);
-            //     #endif
-            // }
-
-            // 実プレイ経過秒で EndGame（ResultUI が OnGameOver を購読していれば表示される）
-            game.EndGame(driver ? driver.ElapsedSeconds : elapsed);
+            if (game) game.EndGame(elapsed); // ← GameController に EndGame が必要
         }
     }
 }

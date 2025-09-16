@@ -5,6 +5,7 @@ namespace TD.Game
 {
     // 既存：逐次表示用（使わないなら未購読でOK）
     public delegate void ScoreUpdatedHandler(int score, int okCount);
+    
 
     // ★ リザルト画面へ渡す集計データ
     [System.Serializable]
@@ -25,8 +26,8 @@ namespace TD.Game
         public void ComputeDerived()
         {
             // 文字数が無ければ OK×5 を近似
-            int correct = (CorrectChars > 0) ? CorrectChars : (OkCount * 5);
-            int typed   = (TypedChars   > 0) ? TypedChars   : ((OkCount + MissCount) * 5);
+            int correct = (CorrectChars > 0) ? CorrectChars : OkCount;
+            int typed   = (TypedChars   > 0) ? TypedChars   : (OkCount + MissCount);
 
             float minutes = Mathf.Max(0.001f, ElapsedSeconds / 60f);
             WPMRounded = Mathf.RoundToInt((correct / 5f) / minutes);
@@ -57,7 +58,7 @@ namespace TD.Game
         {
             TypingEvents.WordOk += OnWordOk;
             // 必要なら他のイベントも購読して加算：
-            // TypingEvents.WordMiss += OnWordMiss;
+            TypingEvents.Mistake += OnMistake;
             // TypingEvents.CharDelta += OnCharDelta;
             // EnemyEvents.EnemyKilled += OnEnemyKilled;
         }
@@ -65,18 +66,30 @@ namespace TD.Game
         private void OnDisable()
         {
             TypingEvents.WordOk -= OnWordOk;
-            // TypingEvents.WordMiss -= OnWordMiss;
+            TypingEvents.Mistake -= OnMistake;
             // TypingEvents.CharDelta -= OnCharDelta;
             // EnemyEvents.EnemyKilled -= OnEnemyKilled;
+        }
+        
+        private void OnMistake(MistakeEvent e)
+        {
+            MissCount += 1;
+            TypedChars += 1;            // 任意：総打鍵も積むなら
+            // OnScoreUpdated は不要なら呼ばなくてOK
         }
 
         private void OnWordOk(WordOkEvent e)
         {
             // 通知された増分をそのまま加算（再計算しない）
-            Score   += e.scoreDelta;
+            Score += e.scoreDelta;
             OkCount += 1;
 
-            var h = OnScoreUpdated; if (h != null) h(Score, OkCount);
+            // ★ 追加（正打鍵として1文字前進）
+            CorrectChars += 1;
+            TypedChars   += 1;
+
+            var h = OnScoreUpdated;
+            if (h != null) h(Score, OkCount);
         }
 
         // 任意：別イベントから積みたい時の口（今は未使用なら呼ばれない）
@@ -101,12 +114,18 @@ namespace TD.Game
                 OkCount         = this.OkCount,
                 MissCount       = this.MissCount,
                 EnemiesDefeated = this.EnemiesDefeated,
-                CorrectChars    = this.CorrectChars,
-                TypedChars      = this.TypedChars,
+                CorrectChars    = (this.CorrectChars > 0) ? this.CorrectChars : this.OkCount,                   // ★
+                TypedChars      = (this.TypedChars   > 0) ? this.TypedChars   : (this.OkCount + this.MissCount),// ★
                 ElapsedSeconds  = Mathf.Max(0f, elapsedSeconds)
             };
 
             stats.ComputeDerived();
+
+            // ★ Top3 登録＆反映
+            stats.Rank       = HighScores3.Submit(stats.Score);
+            stats.Top3Scores = HighScores3.GetTop3();
+            stats.HighScore  = (stats.Top3Scores != null && stats.Top3Scores.Length > 0)
+                                ? stats.Top3Scores[0] : stats.Score;
 
             // ハイスコア保存
             int prev = PlayerPrefs.GetInt(HighScoreKey, 0);

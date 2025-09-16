@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.SceneManagement;
-using TD.Typing;       // Tick 受信
-using TD.Game;        // GameController（Score）
-using TD.TypingCore;  // TypingController の State 参照用
+using TMPro;
+using TD.Game; // GameStats / GameController
 
 public class ResultUI : MonoBehaviour
 {
@@ -14,60 +12,60 @@ public class ResultUI : MonoBehaviour
     public TMP_Text textWPM;
     public TMP_Text textAcc;
     public TMP_Text textSummary;
-    public Button buttonRestart;
-
-    [Header("Sources")]
-    public GameController game;        // Score を持ってる
-    public TypingController typing;    // WPM/Acc/OK/Miss を読み出す
+    public Button   buttonRestart;
+    public GameController game;
 
     private bool shown;
 
-    private void OnEnable()
+    private void Awake()
     {
-        TypingEvents.Tick += OnTick;
-    }
-    private void OnDisable()
-    {
-        TypingEvents.Tick -= OnTick;
-    }
-
-    private void Start()
-    {
+        if (!game) game = FindObjectOfType<GameController>();
         if (panelResult) panelResult.SetActive(false);
-        if (buttonRestart) buttonRestart.onClick.AddListener(Restart);
+
+        if (buttonRestart)
+        {
+            buttonRestart.onClick.RemoveAllListeners();
+            buttonRestart.onClick.AddListener(Restart);
+        }
+
+        // ここで一度だけ購読（重複防止に -= してから +=）
+        if (game) { game.OnGameOver -= OnGameOverReceived; game.OnGameOver += OnGameOverReceived; }
     }
 
-    private void OnTick(TickEvent e)
+    private void OnDestroy()
+    {
+        if (game) game.OnGameOver -= OnGameOverReceived;
+    }
+
+    private void OnGameOverReceived(GameStats s)
     {
         if (shown) return;
-        if (e.timeLeftMs <= 0f)
-        {
-            shown = true;
-            ShowResult();
-        }
-    }
-
-    private void ShowResult()
-    {
-        // スポーン停止（任意：全Wave停止）
-        foreach (var sp in FindObjectsOfType<TD.TDCore.WaveSpawner>())
-            sp.StopAllCoroutines();
-
-        // 入力も緩く止めたいなら（演出は動かすため TimeScale はいじらない方が楽）
-        // typing.enabled = false;
+        shown = true;
 
         if (panelResult) panelResult.SetActive(true);
+        if (textFinalScore) textFinalScore.text = $"SCORE {s.Score}\nHIGH  {s.HighScore}";
+        if (textWPM)        textWPM.text        = $"WPM: {s.WPMRounded}";
+        if (textAcc)        textAcc.text        = $"Accuracy: {s.AccuracyPercent:0.#}%";
 
-        var s = typing != null ? typing.StateReadonly() : default;
-        if (textFinalScore) textFinalScore.text = $"SCORE { (game != null ? game.Score : 0) }";
-        if (textWPM)        textWPM.text        = $"WPM  { s.wpm:F1}";
-        if (textAcc)        textAcc.text        = $"ACC  { (s.accuracy*100f):F0}%";
-        if (textSummary)    textSummary.text    = $"OK {s.correctCount} / MISS {s.mistakes}";
+        // Summaryに 敵数 と Top3 を追加（Top3が未設定なら2行目は空）
+        string top = (s.Top3Scores != null && s.Top3Scores.Length > 0)
+            ? $"1ST {s.Top3Scores[0]}" +
+            (s.Top3Scores.Length > 1 ? $"   2ND {s.Top3Scores[1]}" : "") +
+            (s.Top3Scores.Length > 2 ? $"   3RD {s.Top3Scores[2]}" : "")
+            : "";
+
+        if (textSummary)
+            textSummary.text =
+                $"OK: {s.OkCount} / MISS: {s.MissCount} / ENE: {s.EnemiesDefeated}"
+                + (top != "" ? $"\n{top}" : "");
+
+        Time.timeScale = 0f;
     }
 
     private void Restart()
     {
-        // シーン再読み込み（最も簡単）
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Time.timeScale = 1f;
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.buildIndex);
     }
 }
