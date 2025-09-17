@@ -5934,11 +5934,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18fd5bddc9a7983489be33b1dae0ef04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSeconds: 5
-  words: []
-  _scoreAtWordStart: 0
-  _kanaAtWordStart: 
-  _elapsed: 0
 --- !u!4 &611292732
 Transform:
   m_ObjectHideFlags: 0
@@ -5989,7 +5984,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -320}
-  m_SizeDelta: {x: 400, y: 60}
+  m_SizeDelta: {x: 800, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &697314388
 MonoBehaviour:
@@ -9329,7 +9324,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -260}
-  m_SizeDelta: {x: 400, y: 60}
+  m_SizeDelta: {x: 600, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1992311843
 MonoBehaviour:
@@ -9625,7 +9620,7 @@ MonoBehaviour:
   - {fileID: 1411341917}
   - {fileID: 1058854189}
   - {fileID: 264803706}
-  towerPrefab: {fileID: 5930479617068939496, guid: 8ea830206c563f84bb9a739ba1207006, type: 3}
+  towerPrefab: {fileID: 3982654248562889982, guid: 1e0ccec58b1123e49958b85182743783, type: 3}
   addTowerAt: 03000000070000000c0000001200000019000000210000002a000000340000003f0000004b00000058000000660000007500000085000000
   upgradeAt: 060000000d000000140000001e0000002d0000003c0000005000000064000000
 --- !u!4 &2097136298

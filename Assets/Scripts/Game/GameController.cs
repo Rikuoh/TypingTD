@@ -22,12 +22,15 @@ namespace TD.Game
 
         public int   WPMRounded;
         public float AccuracyPercent;
+        
+        public int   Rank;          // 今回の順位（1=1位）
+        public int[] Top3Scores;    // 上位3スコア
 
         public void ComputeDerived()
         {
             // 文字数が無ければ OK×5 を近似
             int correct = (CorrectChars > 0) ? CorrectChars : OkCount;
-            int typed   = (TypedChars   > 0) ? TypedChars   : (OkCount + MissCount);
+            int typed = (TypedChars > 0) ? TypedChars : (OkCount + MissCount);
 
             float minutes = Mathf.Max(0.001f, ElapsedSeconds / 60f);
             WPMRounded = Mathf.RoundToInt((correct / 5f) / minutes);
