@@ -139,3 +139,14 @@ MonoBehaviour:
   fireRatePerLevel: 0.2
   damagePerLevel: 1
   rangePerLevel: 0.5
+  head: {fileID: 0}
+  turnSpeedDeg: 720
+  spriteAngleOffset: 0
+  fireOnlyWhenAimed: 1
+  fireReadyAngle: 5
+  skinGreen: {fileID: 0}
+  skinRed: {fileID: 0}
+  muzzles: []
+  startPowered: 0
+  poweredFireRateMultiplier: 2
+  muzzleStaggerSeconds: 0.2

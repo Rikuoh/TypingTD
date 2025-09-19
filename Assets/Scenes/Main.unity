@@ -663,7 +663,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textKana: {fileID: 200048607}
   textRomaji: {fileID: 1038198710}
-  baseSeconds: 10
+  baseSeconds: 30
+  powerUp: {fileID: 1136199222}
 --- !u!1 &232351583
 GameObject:
   m_ObjectHideFlags: 0
@@ -5905,50 +5906,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &611292730
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 611292732}
-  - component: {fileID: 611292731}
-  m_Layer: 0
-  m_Name: _Typing
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &611292731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 611292730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18fd5bddc9a7983489be33b1dae0ef04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &611292732
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 611292730}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.2181983, y: 2.1897283, z: 0.06711648}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &697314386
 GameObject:
   m_ObjectHideFlags: 0
@@ -7167,6 +7124,57 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1136199221
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1136199223}
+  - component: {fileID: 1136199222}
+  m_Layer: 0
+  m_Name: StreakPowerUp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1136199222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136199221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577a93772de71f54fbf16a2ae9bafb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialDuration: 90
+  thresholdFraction: 0.33333334
+  autoSyncInitialOnFirstTime: 1
+  requiredStreak: 3
+  powerUpDuration: 8
+  triggerCooldown: 5
+  repeatable: 1
+--- !u!4 &1136199223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136199221}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.10732, y: 3.2894042, z: 0.08740954}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1143279215
 GameObject:
   m_ObjectHideFlags: 0
@@ -9238,6 +9246,7 @@ MonoBehaviour:
     interval: 0.55
     startDelay: 10
   verboseLogging: 0
+  initialSpreadWidth: 2.5
 --- !u!4 &1867265252
 Transform:
   m_ObjectHideFlags: 0
@@ -9657,4 +9666,4 @@ SceneRoots:
   - {fileID: 606240446}
   - {fileID: 368924968}
   - {fileID: 1180407956}
-  - {fileID: 611292732}
+  - {fileID: 1136199223}

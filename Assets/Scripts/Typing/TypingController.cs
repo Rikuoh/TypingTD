@@ -3,6 +3,8 @@ using UnityEngine;
 using TMPro;
 using TD.Typing;       // 既存のイベント
 using TD.TypingCore;  // 上で作ったコア
+using TD.Game;
+
 
 public class TypingController : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class TypingController : MonoBehaviour
 
     [Header("Config")]
     public float baseSeconds = 90f;
+    public StreakPowerUpSystem powerUp;
 
     private TypingEngineCore engine;
 
@@ -20,6 +23,7 @@ public class TypingController : MonoBehaviour
         var words = LoadWords();
         engine = new TypingEngineCore(baseSeconds, words);
         Render();
+        if (powerUp) powerUp.SetInitialDuration(baseSeconds);
     }
 
     void Update()
@@ -27,6 +31,11 @@ public class TypingController : MonoBehaviour
         // 時間進行
         float dtMs = Time.deltaTime * 1000f;
         engine.Update(dtMs);
+
+        // ★ 追加：残り時間（秒）を StreakPowerUpSystem へ
+        if (powerUp) powerUp.SetRemainingSeconds(engine.State().timeLeftMs / 1000f);
+
+
         TypingEvents.RaiseTick(engine.State().timeLeftMs);
 
         // 入力
@@ -35,6 +44,14 @@ public class TypingController : MonoBehaviour
             var before = engine.State();
             engine.TypeChar(c.ToString());
             var after = engine.State();
+
+            // ★ 正解が1つ進んだ（＝streak が増えた）瞬間
+            if (powerUp && after.streak > before.streak)
+                powerUp.OnTypeCorrect();
+
+            // ★ ミスが増えた瞬間
+            if (powerUp && after.mistakes > before.mistakes)
+                powerUp.OnTypeMiss();
 
             // 判定の差分からイベントを発火
             if (after.score != before.score)
